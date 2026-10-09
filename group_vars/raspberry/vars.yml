@@ -1,0 +1,25 @@
+---
+compose_root: "/home/{{ ansible_user }}/docker"
+
+# Image versions
+adguard_version: v0.107.73
+rustdesk_version: latest
+cadvisor_version: v0.55.1
+pve_exporter_version: latest
+
+# RustDesk: address clients use to reach the relay (hbbr)
+rustdesk_relay_host: "{{ ansible_host | default(inventory_hostname) }}"
+
+# Proxmox exporter: read-only API token (PVEAuditor role)
+pve_exporter_user: prometheus@pve
+pve_exporter_token_name: exporter
+pve_exporter_verify_ssl: false
+
+compose_stacks:
+  - name: adguardhome
+  - name: rustdesk
+  - name: cAdvisor
+  - name: pve-exporter
+    files:
+      # uid 101 = "prometheus" user inside the exporter image
+      - { dest: pve.yml, owner: "101", group: root, mode: "0600", secret: true }

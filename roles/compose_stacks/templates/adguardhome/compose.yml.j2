@@ -1,0 +1,10 @@
+services:
+  adguardhome:
+    image: adguard/adguardhome:{{ adguard_version }}
+    container_name: adguardhome
+    restart: unless-stopped
+    # Host networking: DNS (53) and DHCP need direct access to the LAN.
+    network_mode: host
+    volumes:
+      - /opt/adguardhome/conf:/opt/adguardhome/conf
+      - /opt/adguardhome/work:/opt/adguardhome/work

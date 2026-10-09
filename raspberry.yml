@@ -1,0 +1,8 @@
+---
+- name: Provision the Raspberry Pi network node
+  hosts: raspberry
+  become: true
+
+  roles:
+    - docker
+    - compose_stacks

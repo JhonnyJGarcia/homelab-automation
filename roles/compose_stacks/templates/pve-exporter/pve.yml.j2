@@ -1,0 +1,5 @@
+default:
+  user: {{ pve_exporter_user }}
+  token_name: {{ pve_exporter_token_name }}
+  token_value: {{ vault_pve_exporter_token_value }}
+  verify_ssl: {{ pve_exporter_verify_ssl | lower }}

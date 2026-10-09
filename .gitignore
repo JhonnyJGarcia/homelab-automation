@@ -1,3 +1,4 @@
 hosts.ini
 *.retry
 .DS_Store
+group_vars/*/vault.yml

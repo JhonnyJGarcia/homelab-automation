@@ -1,0 +1,4 @@
+---
+# Copy to vault.yml (this .example file is not loaded by Ansible), fill in,
+# then encrypt:  ansible-vault encrypt group_vars/raspberry/vault.yml
+vault_pve_exporter_token_value: "<proxmox-api-token-secret>"
