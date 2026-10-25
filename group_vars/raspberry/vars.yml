@@ -6,9 +6,16 @@ adguard_version: v0.107.73
 rustdesk_version: latest
 cadvisor_version: v0.55.1
 pve_exporter_version: latest
+loki_version: 3.7.9
 
 # RustDesk: address clients use to reach the relay (hbbr)
 rustdesk_relay_host: "{{ ansible_default_ipv4.address }}"
+
+# Loki: log store queried by Grafana over the VPN; Alloy on each host pushes to it.
+# No authentication is configured, so limit loki_bind_address to the VPN/LAN
+# interface address when the Pi is reachable from untrusted networks.
+loki_bind_address: "0.0.0.0"
+loki_retention: 720h   # 30 days
 
 # Proxmox exporter: read-only API token (PVEAuditor role)
 pve_exporter_user: prometheus@pve
@@ -19,6 +26,9 @@ compose_stacks:
   - name: adguardhome
   - name: rustdesk
   - name: cAdvisor
+  - name: Loki
+    files:
+      - { dest: loki-config.yaml }
   - name: pve-exporter
     files:
       # uid 101 = "prometheus" user inside the exporter image

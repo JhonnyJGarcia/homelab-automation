@@ -24,14 +24,14 @@
   loop_control:
     label: "{{ item.name }}"
 
-# compose.yaml takes precedence; drop the legacy name to avoid confusion.
-- name: Remove legacy docker-compose.yml files
+# compose.yaml takes precedence; drop the legacy names to avoid confusion.
+- name: Remove legacy docker-compose files
   ansible.builtin.file:
-    path: "{{ compose_root }}/{{ item.name }}/docker-compose.yml"
+    path: "{{ compose_root }}/{{ item.0.name }}/{{ item.1 }}"
     state: absent
-  loop: "{{ compose_stacks }}"
+  loop: "{{ compose_stacks | product(['docker-compose.yml', 'docker-compose.yaml']) | list }}"
   loop_control:
-    label: "{{ item.name }}"
+    label: "{{ item.0.name }}/{{ item.1 }}"
 
 - name: Deploy extra config files
   ansible.builtin.template:

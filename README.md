@@ -17,12 +17,13 @@ Stacks:
 - **RustDesk server** (`hbbs` + `hbbr`) — self-hosted remote support
 - **cAdvisor** — container metrics for **Prometheus**, bound to localhost only
 - **prometheus-pve-exporter** — **Proxmox VE** metrics via a read-only API token
+- **Loki** — central log store (single node, filesystem storage, 30-day retention) queried by **Grafana**; **Grafana Alloy** on each host pushes its journal to it
 
 ### Design choices
 
 - **Templates, not copies:** compose files are Jinja2 templates; image versions and host-specific values live in `group_vars/raspberry/vars.yml`
 - **Secrets stay out of Git:** the Proxmox API token lives in an **ansible-vault** encrypted `vault.yml` (gitignored); its config file is deployed with mode `0600` and `no_log`
-- **Least exposure:** metrics exporters listen on `127.0.0.1` only — Prometheus runs on the same host
+- **Least exposure:** metrics exporters listen on `127.0.0.1` only — Prometheus runs on the same host. Loki has no authentication, so its listen address is a variable (`loki_bind_address`) to pin to the VPN or LAN interface
 - **Idempotent:** safe to re-run; only changed stacks are restarted
 
 ### Usage
@@ -49,4 +50,5 @@ roles/
   compose_stacks/
     tasks/main.yml
     templates/<stack>/compose.yml.j2
+    templates/Loki/loki-config.yaml.j2   # retention and storage settings
 ```
