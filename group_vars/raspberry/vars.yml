@@ -11,10 +11,14 @@ loki_version: 3.7.9
 # RustDesk: address clients use to reach the relay (hbbr)
 rustdesk_relay_host: "{{ ansible_default_ipv4.address }}"
 
+# VPN interface: Docker must start after it, because Loki binds to its address
+vpn_interface: wg0
+docker_after_units:
+  - "wg-quick@{{ vpn_interface }}.service"
+
 # Loki: log store queried by Grafana over the VPN; Alloy on each host pushes to it.
-# No authentication is configured, so limit loki_bind_address to the VPN/LAN
-# interface address when the Pi is reachable from untrusted networks.
-loki_bind_address: "0.0.0.0"
+# No authentication is configured, so it listens on the VPN address only.
+loki_bind_address: "{{ ansible_facts[vpn_interface]['ipv4']['address'] }}"
 loki_retention: 720h   # 30 days
 
 # Proxmox exporter: read-only API token (PVEAuditor role)

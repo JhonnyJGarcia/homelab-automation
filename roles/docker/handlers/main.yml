@@ -1,0 +1,5 @@
+---
+# Ordering only matters at boot, so a daemon-reload is enough (no Docker restart).
+- name: Reload systemd
+  ansible.builtin.systemd_service:
+    daemon_reload: true

@@ -8,7 +8,7 @@ Rebuilds my **Raspberry Pi 4** (Debian 13, arm64) from a clean OS to the service
 
 | Role | What it does |
 |---|---|
-| `docker` | Installs **Docker Engine** and the **Compose plugin** from Docker's official apt repository, removing the conflicting distro packages first |
+| `docker` | Installs **Docker Engine** and the **Compose plugin** from Docker's official apt repository, removing the conflicting distro packages first; orders Docker after the **WireGuard** interface at boot |
 | `compose_stacks` | Deploys each service as a **Docker Compose** stack under `~/docker/<name>/`, renders its config files and brings it up |
 
 Stacks:
@@ -23,7 +23,7 @@ Stacks:
 
 - **Templates, not copies:** compose files are Jinja2 templates; image versions and host-specific values live in `group_vars/raspberry/vars.yml`
 - **Secrets stay out of Git:** the Proxmox API token lives in an **ansible-vault** encrypted `vault.yml` (gitignored); its config file is deployed with mode `0600` and `no_log`
-- **Least exposure:** metrics exporters listen on `127.0.0.1` only — Prometheus runs on the same host. Loki has no authentication, so its listen address is a variable (`loki_bind_address`) to pin to the VPN or LAN interface
+- **Least exposure:** metrics exporters listen on `127.0.0.1` only — Prometheus runs on the same host. Loki has no authentication, so it binds to the **WireGuard** interface address only (read from host facts, never hard-coded); a systemd drop-in starts Docker after the VPN so the bind can't fail at boot
 - **Idempotent:** safe to re-run; only changed stacks are restarted
 
 ### Usage
@@ -46,7 +46,9 @@ group_vars/raspberry/
   vars.yml                 # versions, stack list, non-secret settings
   vault.yml.example        # template for the encrypted secrets file
 roles/
-  docker/tasks/main.yml
+  docker/
+    tasks/main.yml
+    handlers/main.yml
   compose_stacks/
     tasks/main.yml
     templates/<stack>/compose.yml.j2
